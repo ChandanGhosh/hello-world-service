@@ -1,0 +1,13 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: hello-world-service
+  namespace: hello-app
+spec:
+  chart:
+    repository: https://chandanghosh.github.io/hello-world-service/
+    name: hello-world-service
+    version: 0.1.1
+  values:
+    ingress:
+      enabled: false
