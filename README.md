@@ -4,10 +4,7 @@ Explorin flux
 # Pre-reqs
 * fluxctl
 * kubectl
-* KIND cluster
-* kubectl create namespace flux
-* kubectl apply -f flux.yaml
-* fluxctl identity --k8s-fwd-ns flux
+* KIND/minikube cluster
 
 ---------------------------------------------------------------------------------------------------
 
@@ -58,23 +55,22 @@ fluxctl identity --k8s-fwd-ns fluxcd
 kubectl -n fluxcd logs deployment/flux | grep identity.pub | cut -d '"' -f2
 ```
 
-# Now create a chart for your deployment
+# Now add a chart repo for your deployment
 ```
-helm create hello-world-service
-```
-
-# Once the chart folder is created, just change the image repository value no nginx version 1.14.2 in the values.yaml file.
-
-# Then test the deployment first. Please note this is not the HelmRelease we want to achieve the GitOps with. We're just ensuring that our chart is valid and can be used for deployment.
-
-```
-helm upgrade -i hello-world-app hello-world-service
-```
-# Test the app
-
-# Create chart archive after successfullky testing the app
-
-```
-make all
+helm repo add hello-world-service https://chandanghosh.github.io/hello-world-service/
 ```
 
+# Now as soon as any changes published to HelmRelease yaml file under releases folder in the git repo, the flux container will pull the changes and hand it over to HelmOperator.
+
+# As Helm Operator sees that this is a "HelmRelease" type deployment, it immediately deploys the chart and create a helm deployment for release management. 
+You can ensure that flux has synced the latest commit from git by:
+```
+fluxctl sync --k8s-fwd-ns fluxcd
+```
+
+# Check the Helmrelease
+
+```
+kubectl get helmrelease -A
+
+```
